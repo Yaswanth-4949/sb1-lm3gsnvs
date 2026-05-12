@@ -84,6 +84,40 @@ export default function App() {
     const id = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(id);
   }, []);
+  const sendSensorData = async () => {
+
+  try {
+
+    const response = await fetch(
+      "https://ijhn4o3921.execute-api.us-east-1.amazonaws.com/prod1/sensor",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          gas: Math.round(sensors.gas),
+          temperature: sensors.temperature,
+          humidity: sensors.humidity
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    console.log(data);
+
+    alert("Data Stored Successfully");
+
+  } catch (error) {
+
+    console.log(error);
+
+    alert("Failed to Send Data");
+
+  }
+
+};
 
   const updateSensors = useCallback(() => {
     setSensors(prev => ({
@@ -218,7 +252,10 @@ export default function App() {
               <p className="text-slate-500 text-xs mb-5">Toggle live sensor data updates</p>
 
               <button
-                onClick={() => setIsMonitoring(v => !v)}
+  onClick={() => {
+    setIsMonitoring(v => !v);
+    sendSensorData();
+  }}
                 className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 active:scale-95
                   ${isMonitoring
                     ? 'bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20'
